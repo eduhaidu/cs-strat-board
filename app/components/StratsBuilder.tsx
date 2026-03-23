@@ -2,7 +2,6 @@
 import { useState } from "react"
 import Sidebar from "./Sidebar"
 import MapBoard from "./MapBoard"
-import useImage from "use-image";
 
 export default function StratsBuilder() {
     const [boardItems, setBoardItems] = useState<any[]>([]); // State to hold the items placed on the board

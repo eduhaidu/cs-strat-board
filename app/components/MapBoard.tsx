@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState} from "react"
+import React from "react"
 import { Stage, Layer, Image as KonvaImage} from "react-konva"
 import useImage from "use-image"
 
@@ -17,39 +17,22 @@ export default function MapBoard({ boardItems, setBoardItems }: { boardItems: Bo
     const boardWidth = 800;
     const boardHeight = 800;
 
+    const boardItemSize = 50;
+
+    const [playerTImage] = useImage("/player_t.png");
+    const [playerCTImage] = useImage("/player_ct.png");
     const [smokePlacedImage] = useImage("/smoke_placed.png");
     const [mollyPlacedImage] = useImage("/molotov_placed.png");
     const [flashPlacedImage] = useImage("/flashbang_placed.png");
     const [grenadePlacedImage] = useImage("/he_placed.png");
 
-//     React.useEffect(() => {
-//         // This effect will run whenever the boardItems state changes. It will update the boardItems with the correct images based on their type.
-//         const updatedBoardItems = boardItems.map(item => {
-//             let image;
-//             switch(item.type) {
-//                 case "smoke":
-//                     image = smokePlacedImage;
-//                     break;
-//                 case "molly":
-//                     image = mollyPlacedImage;
-//                     break;
-//                 case "flashbang":
-//                     image = flashPlacedImage;
-//                     break;
-//                 case "he":
-//                     image = grenadePlacedImage;
-//                     break;
-//                 default:
-//                     image = null;
-//             }
-//             return { ...item, image };
-//         });
-//         setBoardItems(updatedBoardItems);
-//     }
-// ), [boardItems, smokePlacedImage, mollyPlacedImage, flashPlacedImage, grenadePlacedImage];
 
     const getImageForType = (type: string) => {
         switch(type) {
+            case "player_t":
+                return playerTImage;
+            case "player_ct":
+                return playerCTImage;
             case "smoke":
                 return smokePlacedImage;
             case "molly":
@@ -81,8 +64,8 @@ export default function MapBoard({ boardItems, setBoardItems }: { boardItems: Bo
                         <KonvaImage
                             key={index}
                             image={getImageForType(item.type)}
-                            width={item.width}
-                            height={item.height}
+                            width={boardItemSize}
+                            height={boardItemSize}
                             x={item.x}
                             y={item.y}
                             draggable
