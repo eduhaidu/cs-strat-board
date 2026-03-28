@@ -12,8 +12,13 @@ interface BoardItem {
     y: number;
 }
 
-export default function MapBoard({ boardItems, setBoardItems }: { boardItems: BoardItem[]; setBoardItems: React.Dispatch<React.SetStateAction<BoardItem[]>> }) {
-    const [mapImage] = useImage("/mirage.png");
+interface MapProps {
+    name: string;
+    image: string;
+}
+
+export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { boardItems: BoardItem[]; setBoardItems: React.Dispatch<React.SetStateAction<BoardItem[]>>; selectedMap: MapProps }) {
+    const [mapImage] = useImage(selectedMap.image);
     const boardWidth = 800;
     const boardHeight = 800;
 
