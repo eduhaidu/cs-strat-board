@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { Stage, Layer, Image as KonvaImage} from "react-konva"
 import useImage from "use-image"
 
@@ -31,7 +31,7 @@ export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { b
     const [flashPlacedImage] = useImage("/flashbang_placed.png");
     const [grenadePlacedImage] = useImage("/he_placed.png");
 
-
+    const [isDragging, setIsDragging] = useState(false);
     const getImageForType = (type: string) => {
         switch(type) {
             case "player_t":
@@ -74,6 +74,27 @@ export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { b
                             x={item.x}
                             y={item.y}
                             draggable
+                            opacity={isDragging ? 0.5 : 1}
+                            onDragStart={() => setIsDragging(true)}
+                            onDragMove={(e) => {
+                                const updatedItems = [...boardItems];
+                                updatedItems[index] = {
+                                    ...updatedItems[index],
+                                    x: e.target.x(),
+                                    y: e.target.y()
+                                };
+                                setBoardItems(updatedItems);
+                            }}
+                            onDragEnd={(e) => {
+                                setIsDragging(false);
+                                const updatedItems = [...boardItems];
+                                updatedItems[index] = {
+                                    ...updatedItems[index],
+                                    x: e.target.x(),
+                                    y: e.target.y()
+                                };
+                                setBoardItems(updatedItems);
+                            }}
                         />
                     ))}
                 </Layer>
