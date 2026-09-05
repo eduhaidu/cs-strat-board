@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { Stage, Layer, Image as KonvaImage} from "react-konva"
 import useImage from "use-image"
 
@@ -17,7 +17,7 @@ interface MapProps {
     image: string;
 }
 
-export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { boardItems: BoardItem[]; setBoardItems: React.Dispatch<React.SetStateAction<BoardItem[]>>; selectedMap: MapProps }) {
+export default function MapBoard({ boardItems, setBoardItems, selectedMap, removeBoardItem }: { boardItems: BoardItem[]; setBoardItems: React.Dispatch<React.SetStateAction<BoardItem[]>>; selectedMap: MapProps; removeBoardItem: (index: number) => void }) {
     const [mapImage] = useImage(selectedMap.image);
     const boardWidth = 800;
     const boardHeight = 800;
@@ -30,6 +30,10 @@ export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { b
     const [mollyPlacedImage] = useImage("/molotov_placed.png");
     const [flashPlacedImage] = useImage("/flashbang_placed.png");
     const [grenadePlacedImage] = useImage("/he_placed.png");
+    const [showItemMenu, setShowItemMenu] = useState(false);
+    const [selectedItemIndex, setSelectedItemIndex] = useState<number | null>(null);
+    const [itemMenuPosition, setItemMenuPosition] = useState({ x: 0, y: 0 });
+    const stageRef = useRef<any>(null);
 
     const [isDragging, setIsDragging] = useState(false);
     const getImageForType = (type: string) => {
@@ -51,9 +55,51 @@ export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { b
         }
     };
 
+    useEffect(()=>{
+        const handleWindowClick = () => {
+            setShowItemMenu(false);
+        };
+
+        window.addEventListener("click", handleWindowClick);
+        return () => {
+            window.removeEventListener("click", handleWindowClick);
+        };
+    }, []);
+
+    const handleItemMenu = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        event.preventDefault();
+        if (event.button !== 2) return; // Only proceed if it's a right-click
+        if (event.target === stageRef.current) return;
+        const stage = stageRef.current;
+        if (stage) {
+            const pointerPosition = stage.getPointerPosition();
+            const containerRect = stage.container().getBoundingClientRect();
+            
+            const clickedItemIndex = boardItems.findIndex(item => {
+                return (
+                    pointerPosition.x >= item.x &&
+                    pointerPosition.x <= item.x + boardItemSize &&
+                    pointerPosition.y >= item.y &&
+                    pointerPosition.y <= item.y + boardItemSize
+                );
+            });
+
+            if (clickedItemIndex === -1) {
+                setShowItemMenu(false);
+                return;
+            }
+            setItemMenuPosition({
+                x: pointerPosition.x + containerRect.left,
+                y: pointerPosition.y + containerRect.top
+            });
+            setShowItemMenu(true);
+            setSelectedItemIndex(clickedItemIndex);
+        };
+    }
+
     return (
-        <div className="flex justify-center items-center bg-zinc-900 p-4 rounded-xl">
-            <Stage width={boardWidth} height={boardHeight}>
+        <div className="flex justify-center items-center bg-zinc-900 p-4 rounded-xl" onContextMenu={handleItemMenu}>
+            <Stage width={boardWidth} height={boardHeight} ref={stageRef}>
                 <Layer>
                     {mapImage && (
                         <KonvaImage
@@ -74,8 +120,11 @@ export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { b
                             x={item.x}
                             y={item.y}
                             draggable
-                            opacity={isDragging ? 0.5 : 1}
-                            onDragStart={() => setIsDragging(true)}
+                            opacity={isDragging && selectedItemIndex === index ? 0.5 : 1}
+                            onDragStart={() => {
+                                setIsDragging(true);
+                                setSelectedItemIndex(index);
+                            }}
                             onDragMove={(e) => {
                                 const updatedItems = [...boardItems];
                                 updatedItems[index] = {
@@ -99,6 +148,19 @@ export default function MapBoard({ boardItems, setBoardItems, selectedMap }: { b
                     ))}
                 </Layer>
             </Stage>
+            {showItemMenu && selectedItemIndex !== null && (
+                <div 
+                    className="absolute bg-zinc-800 text-white p-2 rounded-md z-50"
+                    style={{ top: itemMenuPosition.y, left: itemMenuPosition.x, width: "60px", textAlign: "center", zIndex: 1000 }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        removeBoardItem(selectedItemIndex);
+                        setShowItemMenu(false);
+                    }}
+                >
+                    Delete
+                </div>
+            )}
         </div>
     )
 }
