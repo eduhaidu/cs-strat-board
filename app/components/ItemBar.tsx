@@ -9,7 +9,7 @@ const availableItems = [
     { type: "he", image: "/he.png" }
 ]
 
-export default function Sidebar({ onAddItem }: { onAddItem: (type: string, x: number, y: number) => void}) {
+export default function ItemBar({ onAddItem }: { onAddItem: (type: string, x: number, y: number) => void}) {
     const itemSize = 50;
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -49,7 +49,7 @@ export default function Sidebar({ onAddItem }: { onAddItem: (type: string, x: nu
     }
 
     return (
-        <div className="w-64 h-20 bg-zinc-900 rounded-xl p-4 flex flex-row gap-4 border border-zinc-800 shrink-0">
+        <div className="w-64 h-2 bg-zinc-900 rounded-xl p-4 flex flex-row gap-4 border border-zinc-800 shrink-0">
             <div className="flex flex-row gap-2">
                 {availableItems.map((item) => (
                     <div key={item.type} className="cursor-pointer" onClick={() => onItemClick(item.type, 100, 100)} onMouseDown={(e) => handleMouseDown(e, item.type)} onMouseUp={(e) => handleMouseUp(e, selectedItem || item.type)}>

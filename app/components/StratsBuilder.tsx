@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from "react"
-import Sidebar from "./Sidebar"
+import ItemBar from "./ItemBar"
 import MapBoard from "./MapBoard"
 
 const availableMaps = [
@@ -18,7 +18,7 @@ export default function StratsBuilder() {
     const [boardItems, setBoardItems] = useState<any[]>([]); // State to hold the items placed on the board
     const [selectedMap, setSelectedMap] = useState(availableMaps[0]); // State to hold the currently selected map
     const [showMapSelector, setShowMapSelector] = useState(false); // State to control the visibility of the map selector
-    const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    
 
     const addBoardItem = (iconType: string, x: number, y: number) => {
         const newItem = {
@@ -94,7 +94,7 @@ export default function StratsBuilder() {
                     </div>
                 )}
             </div>
-            <Sidebar onAddItem={addBoardItem} /> {/* Pass the addBoardItem and removeBoardItem functions to the Sidebar */}
+            <ItemBar onAddItem={addBoardItem} />
             <MapBoard boardItems={boardItems} setBoardItems={setBoardItems} selectedMap={selectedMap} removeBoardItem={removeBoardItem} /> {/* Pass the boardItems state and setter to the MapBoard */}
             <div className="relative">
             <div className="absolute bottom-4 right-4 z-20 flex gap-2">
